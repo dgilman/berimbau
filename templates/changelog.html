@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+{% block title %}Berimbau{% endblock %}
+
+{% block body %}
+{% for entry in log %}
+   <h2>{{ entry.id }} - {{entry.subject}}</h2>
+   <p>Author: {{entry.author_name}} &lt;{{entry.author_email}}&gt;</p>
+   <p>Date: {{entry.date}}
+   {%- if entry.body %}<pre>{{ entry.body }}</pre>{% endif %}
+{% endfor %}
+{% endblock %}

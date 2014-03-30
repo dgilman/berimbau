@@ -1,6 +1,7 @@
 import sqlite3
 import pathlib
 import datetime
+import subprocess
 
 from flask import Flask, g, render_template, jsonify, request, abort, send_file
 
@@ -59,6 +60,17 @@ def fs_page(root):
    if path.is_file():
       return send_file(path.as_posix())
    return render_template('fs.html', root=root, path=path)
+
+@app.route('/changelog')
+def changelog_page():
+   GIT_COMMIT_FIELDS = ['id', 'author_name', 'author_email', 'date', 'subject', 'body']
+   GIT_LOG_FORMAT = ['%h', '%an', '%ae', '%ad', '%s', '%b']
+   GIT_LOG_FORMAT = '%x1f'.join(GIT_LOG_FORMAT) + '%x1e'
+   rval = subprocess.check_output(['git', 'log', '--format={0}'.format(GIT_LOG_FORMAT)])
+   rval = rval.decode().strip('\n\x1e').split("\x1e")
+   log = [row.strip().split("\x1f") for row in rval]
+   log = [dict(zip(GIT_COMMIT_FIELDS, row)) for row in log if row]
+   return render_template('changelog.html', log=log)
 
 if __name__ == '__main__':
    app.run(host='0.0.0.0', threaded=True, debug=True)
