@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+{% block title %}Berimbau{% endblock %}
+
+{% block body %}
+<table class="table table-striped table-bordered table-condensed">
+   {% for name, obj in Config.roots %}
+   <tr>
+      <td><a href="{{ url_for('fs_page', root=obj.kw) }}">{{ obj.name }}</a></td>
+      <td>{{ obj.desc }}</td>
+   </tr>
+   {% endfor %}
+</table>
+{% endblock %}

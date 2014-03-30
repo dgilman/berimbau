@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+{% block title %}Berimbau{% endblock %}
+
+{% block body %}
+<h1>{{ root.name }}</h1>
+<h3>{% for part in path.relative_to(root.root).parts %}
+   {{ part }} {% if not loop.last %}/{% endif %}{% endfor %}</h3>
+<table class="table table-striped table-bordered table-condensed">
+   <tr>
+      <th>Name</th>
+      <th>Size</th>
+      <th>Creation time</th>
+      <th>mtime</th>
+   </tr>
+   <tr>
+   {% if path != root.root %}
+      <td><a href="{{ url_for('fs_page', root=root.kw, path=path.parent.as_posix()) }}">Parent directory</a></td>
+   {% else %}
+      <td><a href="{{ url_for('index_page') }}">Parent directory</a></td>
+   {% endif %}
+   </tr>
+   {%- for child in path.iterdir() if child.name[0] != '.' -%}
+   {% set stat = child.stat() %}
+   <tr>
+      <td><a href="{{ url_for('fs_page', root=root.kw, path=child.relative_to(root.root).as_posix()) }}">{{ child.name }}{% if child.is_dir() %}/{% endif %}</a></td>
+      <td>{% if child.is_dir() %}DIR{% else %}{{ stat.st_size|filesizeformat }}{% endif %}</td>
+      <td>{{ format_ts(stat.st_birthtime) }}</td>
+      <td>{{ format_ts(stat.st_mtime) }}</td>
+   </tr>
+   {%- endfor %}
+</table>
+{% endblock %}
