@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+{% block title %}{{ g.username }} Profile | Berimbau {% endblock %}
+
+{% block body %}
+<form role="form" action="{{ url_for('user_page') }}" method="POST">
+   <div class="form-group">
+      <label for="username">Username</label>
+      <p class="form-control-static">{{ g.user["username"] }}</p>
+   </div>
+   <div class="form-group">
+      <label for="user-email">Email</label>
+      <input type="email" class="form-control" name="user-email" id="user-email" value="{{ email }}">
+   </div>
+   <div class="form-group">
+      <label for="user-password">Password</label>
+      <input type="password" class="form-control" name="user-password" id="user-password">
+      <p class="help-block">Hashed with bcrypt for maximum paranoia.</p>
+   </div>
+   <input type="submit" class="btn btn-default" value="Submit">
+</form>
+{% endblock %}

@@ -42,16 +42,13 @@
                <li><a href="{{ url_for('index_page') }}">Mailing list</a></li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
-               <li><p class="navbar-text"><abbr title="Current upload bandwidth usage on the server.  Capped slightly under the theoretical maximum in order to be a good neighbor.  Does not reflect bandwidth usage of non-server machines on the home network.">Tx Out</abbr>: <span id="txout"></span> kb/s</p></li>
-               <li><p class="navbar-text">Log in</p></li>
+               <li><p class="navbar-text"><abbr title="Current upload bandwidth usage on the server.  Capped slightly under the theoretical maximum in order to be a good neighbor.  Does not reflect bandwidth usage of non-server machines on the home network.">Tx Out</abbr>: <span id="txout">-</span> kb/s</p></li>
+               <li><p class="navbar-text"><a href="{{ url_for('user_page') }}">Change user info</a></p></li>
             </ul>
          </div>
       </div>
    </nav>
    {% block body %}{% endblock %}
-   <div class="row">
-      <div class="col-lg-12">Contact <a href="{{ Config.operator_url }}">{{ Config.operator_name }}</a> for questions or comments.</div>
-   </div>
    </div>
 </body>
 </html>

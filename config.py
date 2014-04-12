@@ -1,32 +1,44 @@
 class TorrentRoot(object):
    root = '/Volumes/ntfs/Torrents'
+   rid = 0
    name = 'Torrents'
    desc = 'Torrent downloads'
 
 class MusicRoot(object):
    root = '/Volumes/ntfs/Music/Music'
+   rid = 1
    name = 'Music'
    desc = 'David\'s iTunes library'
 
 class MoviesRoot(object):
    root = '/Volumes/ntfs/Movies'
+   rid = 2
    name = 'Movies'
    desc = 'Movies'
 
 class OldTorrentRoot(object):
    root = '/Volumes/ntfs/old_torrent'
+   rid = 3
    name = 'dorm.servehttp.com'
    desc = 'the old dorm.servehttp.com server contents'
 
 class TVRoot(object):
    root = '/Volumes/ntfs/TV'
+   rid = 4
    name = 'TV'
    desc = 'Television'
 
 class FappanRoot(object):
    root = '/Volumes/ntfs/fap'
+   rid = 5
    name = 'Fappan'
    desc = 'But I poop from there!'
+
+class StaticRoot(object):
+   root = '/Volumes/ntfs/old_torrent/static'
+   rid = 6
+   name = 'Static'
+   desc = 'The torrents on the old dorm.servehttp.com server that were to be kept permanently'
 
 class Config(object):
    db_dsn = 'db.sqlite3'
@@ -36,6 +48,7 @@ class Config(object):
             ('music', MusicRoot),
             ('movies', MoviesRoot),
             ('dorm.servehttp.com', OldTorrentRoot),
-            ('fap', FappanRoot)
+            ('fap', FappanRoot),
+            ('static', StaticRoot)
    )
    iface = 'en1'
