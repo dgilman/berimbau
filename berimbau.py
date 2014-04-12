@@ -3,10 +3,15 @@ import pathlib
 import datetime
 import subprocess
 import functools
+import itertools
 import datetime
+import threading
+import heapq
+import os
 
 from flask import Flask, g, render_template, jsonify, request, abort, send_file, Response
 import bcrypt
+import fsevents
 
 from ifbw import bw_rate
 
@@ -21,6 +26,54 @@ for name, obj in Config.roots:
       raise Exception("Path {0} not found, fix your config".format(path.root))
    obj.root = p.resolve()
    obj.kw = name
+
+top_50 = []
+top_50_lock = threading.Lock()
+
+def fsevents_callback(*args, **kwargs):
+   global top_50
+   event = args[0]
+   if event.mask & fsevents.IN_CREATE|fsevents.IN_MOVED_FROM:
+      if os.path.basename(event.name)[0] == '.':
+         return
+      if not os.path.exists(event.name):
+         with top_50_lock:
+            if event.name in top_50:
+               top_50.remove(event.name)
+         return
+      candidate = pathlib.Path(event.name).resolve()
+      root_name = None
+      root_path = None
+      for root, obj in [(x[0], x[1].root) for x in Config.roots]:
+         if obj in candidate.parents:
+            root_name, root_path = root, obj
+      if not root_name:
+         return
+      with top_50_lock:
+         top_50 = heapq.nlargest(30, itertools.chain(top_50,
+            ((root_name, candidate.as_posix(), candidate.stat().st_birthtime),),),
+            lambda x: x[2])
+
+obs = fsevents.Observer()
+for root, obj in Config.roots:
+   stream = fsevents.Stream(fsevents_callback, obj.root.as_posix(), file_events=True)
+   obs.schedule(stream)
+obs.start()
+
+def search_dirs(dirs):
+   for root, directory in dirs:
+      for dirpath, dirnames, filenames in os.walk(directory):
+         for filename in filenames:
+            if filename[0] == '.':
+               continue
+            path = os.path.join(dirpath, filename)
+            yield root, path, os.stat(path).st_birthtime
+
+with top_50_lock:
+   top_50 = heapq.nlargest(30,
+      search_dirs([(x[0], x[1].root.as_posix()) for x in Config.roots]),
+      lambda x: x[2])
+
 
 app = Flask(__name__)
 
@@ -70,7 +123,8 @@ def add_globals():
 @app.route('/')
 @login_required
 def index_page():
-   return render_template('index.html')
+   with top_50_lock:
+      return render_template('index.html', top_50=top_50)
 
 @app.route('/fs/<string:root>')
 @login_required
