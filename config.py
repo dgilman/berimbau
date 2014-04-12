@@ -30,6 +30,7 @@ class FappanRoot(object):
 
 class Config(object):
    db_dsn = 'db.sqlite3'
+   site_dir = '/Users/david/berimbau/venv/lib/python3.4/site-packages'
    roots = (('tv', TVRoot),
             ('torrents', TorrentRoot),
             ('music', MusicRoot),
@@ -37,3 +38,4 @@ class Config(object):
             ('dorm.servehttp.com', OldTorrentRoot),
             ('fap', FappanRoot)
    )
+   iface = 'en1'
