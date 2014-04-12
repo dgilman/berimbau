@@ -5,6 +5,8 @@ import subprocess
 
 from flask import Flask, g, render_template, jsonify, request, abort, send_file
 
+from ifbw import bw_rate
+
 from config import Config
 
 def format_ts(unixts):
@@ -71,6 +73,11 @@ def changelog_page():
    log = [row.strip().split("\x1f") for row in rval]
    log = [dict(zip(GIT_COMMIT_FIELDS, row)) for row in log if row]
    return render_template('changelog.html', log=log)
+
+@app.route('/bw')
+def bw_page():
+   ikb_s, okb_s = bw_rate(Config.iface)
+   return jsonify(okb_s=round(okb_s, 2))
 
 if __name__ == '__main__':
    app.run(host='0.0.0.0', threaded=True, debug=True)
