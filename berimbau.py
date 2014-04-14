@@ -20,12 +20,14 @@ from config import Config
 def format_ts(unixts):
    return datetime.datetime.fromtimestamp(unixts).strftime('%m/%d/%y %I:%M:%S %p')
 
+Config.root_map = {}
 for name, obj in Config.roots:
    p = pathlib.Path(obj.root)
    if not p.exists():
       raise Exception("Path {0} not found, fix your config".format(path.root))
    obj.root = p.resolve()
    obj.kw = name
+   Config.root_map[obj.rid] = name
 
 top_50 = []
 top_50_lock = threading.Lock()
@@ -103,6 +105,14 @@ def login_required(fn):
          return login_page()
    return decorated
 
+def admin_required(fn):
+   @functools.wraps(fn)
+   def decorated(*args, **kwargs):
+      if not g.user['is_admin']:
+         abort(403)
+      return fn(*args, **kwargs)
+   return decorated
+
 @app.before_request
 def before_request():
    g.conn = sqlite3.connect(Config.db_dsn, detect_types=sqlite3.PARSE_DECLTYPES)
@@ -146,9 +156,8 @@ def fs_page(root):
       elif root.root not in path.parents:
          abort(403)
 
-   if not g.user['is_admin']:
-      g.c.execute('INSERT INTO logs (id, user, root, ts, path) VALUES (NULL, ?, ?, ?, ?)',
-         (g.user['uid'], root.rid, datetime.datetime.utcnow(), path.as_posix()))
+   g.c.execute('INSERT INTO logs (id, user, root, ts, path) VALUES (NULL, ?, ?, ?, ?)',
+      (g.user['uid'], root.rid, datetime.datetime.utcnow(), path.as_posix()))
 
    if path.is_file():
       return send_file(path.as_posix())
@@ -187,6 +196,30 @@ def user_page():
    else:
       email = ''
    return render_template('user.html', email=email)
+
+@app.route('/oversight')
+@login_required
+@admin_required
+def oversight_page():
+   g.c.execute('SELECT id, username, email, is_admin FROM users')
+   users = g.c.fetchall()
+   return render_template('oversight.html', users=users)
+
+@app.route('/user_log/<int:uid>/', defaults={'page': 1})
+@app.route('/user_log/<int:uid>/<int:page>')
+@login_required
+@admin_required
+def user_log_page(uid, page):
+   g.c.execute('select username, email from users where id = ?', (uid,))
+   user_info = g.c.fetchall()
+   if not user_info:
+      abort(404)
+   name_string = '{0} <{1}>'.format(user_info[0][0], user_info[0][1])
+   g.c.execute('select * from logs where user = ? order by ts desc limit 20 offset ?',
+      (uid, (page-1)*20))
+   logs = g.c.fetchall()
+   return render_template('user_log.html', user_info=name_string,
+      logs=logs, next_page=page+1, uid=uid)
 
 if __name__ == '__main__':
    app.secret_key = b'\x12\xef\xdd\x93\xc8\xf6\xa5\xe0\x90\xfam\x9f\x92\xc0\x18\xa4KvP\x9cV/\xfa\xb1l,\x94\x11\x96a'

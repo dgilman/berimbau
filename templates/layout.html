@@ -27,12 +27,6 @@
    <nav class="navbar navbar-default" role="navigation">
       <div class="container-fluid">
          <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#topnavbar">
-               <span class="sr-only">Toggle navigation</span>
-               <span class="icon-bar"></span>
-               <span class="icon-bar"></span>
-               <span class="icon-bar"></span>
-            </button>
             <span class="navbar-brand">Berimbau</span>
          </div>
          <div class="collapse navbar-collapse" id="topnavbar">
@@ -40,6 +34,7 @@
                <li><a href="{{ url_for('index_page') }}">Browse files</a></li>
                <li><a href="{{ url_for('changelog_page') }}">Patch notes</a></li>
                <li><a href="{{ url_for('index_page') }}">Mailing list</a></li>
+               {% if g.user.is_admin %}<li><a href="{{ url_for('oversight_page') }}">Oversight</a></li>{% endif %}
             </ul>
             <ul class="nav navbar-nav navbar-right">
                <li><p class="navbar-text"><abbr title="Current upload bandwidth usage on the server.  Capped slightly under the theoretical maximum in order to be a good neighbor.  Does not reflect bandwidth usage of non-server machines on the home network.">Tx Out</abbr>: <span id="txout">-</span> kb/s</p></li>
