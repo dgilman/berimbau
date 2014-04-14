@@ -2,7 +2,7 @@ class TorrentRoot(object):
    root = '/Volumes/ntfs/Torrents'
    rid = 0
    name = 'Torrents'
-   desc = 'Torrent downloads'
+   desc = 'Torrent download folder'
 
 class MusicRoot(object):
    root = '/Volumes/ntfs/Music/Music'
