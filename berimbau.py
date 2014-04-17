@@ -115,7 +115,8 @@ def admin_required(fn):
 
 @app.before_request
 def before_request():
-   g.conn = sqlite3.connect(Config.db_dsn, detect_types=sqlite3.PARSE_DECLTYPES)
+   g.conn = sqlite3.connect(Config.db_dsn, isolation_level=None,
+      detect_types=sqlite3.PARSE_DECLTYPES)
    g.c = g.conn.cursor()
    g.user = None
 
