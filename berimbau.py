@@ -190,6 +190,9 @@ def bw_page():
 @login_required
 def user_page():
    if request.method == 'POST':
+      # lol no flashes
+      if request.form['user-password'] == '':
+         return Response('Put in your password (or at least re-enter it if you don\'t want to change it).')
       new_hash = bcrypt.hashpw(request.form['user-password'], bcrypt.gensalt())
       var = request.form.getlist('user-download')
       if var and var[0] == 'on':
