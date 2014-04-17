@@ -16,6 +16,11 @@
       <input type="password" class="form-control" name="user-password" id="user-password">
       <p class="help-block">Hashed with bcrypt for maximum paranoia.</p>
    </div>
+   <div class="checkbox">
+      <label>
+      <input type="checkbox" name="user-download" {% if download %} checked{% endif %}> Download files instead of viewing in browser?
+      </label>
+   </div>
    <input type="submit" class="btn btn-default" value="Submit">
 </form>
 {% endblock %}

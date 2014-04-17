@@ -3,7 +3,8 @@ CREATE TABLE users (
    username TEXT UNIQUE,
    password BLOB,
    email TEXT,
-   is_admin BOOLEAN
+   is_admin BOOLEAN,
+   download BOOLEAN,
    );
 
 CREATE TABLE taglines (

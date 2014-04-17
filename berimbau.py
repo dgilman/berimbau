@@ -93,13 +93,17 @@ def login_required(fn):
       if not auth:
          return login_page()
       rval = g
-      g.c.execute('SELECT id, password, is_admin FROM users WHERE username = ?', (auth.username,))
+      g.c.execute('SELECT id, password, is_admin, download FROM users WHERE username = ?', (auth.username,))
       rval = g.c.fetchall()
       if not rval:
          return login_page()
-      uid, password_hash, is_admin = rval[0]
+      uid, password_hash, is_admin, download = rval[0]
       if bcrypt.hashpw(auth.password, password_hash):
          g.user = {"uid": uid, "username": auth.username, "is_admin": is_admin}
+         if download:
+            g.user['download'] = True
+         else:
+            g.user['download'] = False
          return fn(*args, **kwargs)
       else:
          return login_page()
@@ -161,7 +165,7 @@ def fs_page(root):
       (g.user['uid'], root.rid, datetime.datetime.utcnow(), path.as_posix()))
 
    if path.is_file():
-      return send_file(path.as_posix())
+      return send_file(path.as_posix(), as_attachment=g.user["download"])
    return render_template('fs.html', root=root, path=path)
 
 @app.route('/changelog')
@@ -187,16 +191,20 @@ def bw_page():
 def user_page():
    if request.method == 'POST':
       new_hash = bcrypt.hashpw(request.form['user-password'], bcrypt.gensalt())
-      g.c.execute('UPDATE users SET password = ?, email = ? WHERE id = ?',
-         (new_hash, request.form['user-email'], g.user['uid']))
-      return render_template('user.html', email=request.form['user-email'])
-   g.c.execute('SELECT email FROM users WHERE id = ?', (g.user['uid'],))
-   email = g.c.fetchall()
-   if email:
-      email = email[0][0]
-   else:
+      var = request.form.getlist('user-download')
+      if var and var[0] == 'on':
+         download = True
+      else:
+         download = False
+      g.c.execute('UPDATE users SET password = ?, email = ?, download = ? WHERE id = ?',
+         (new_hash, request.form['user-email'], download, g.user['uid']))
+      return render_template('user.html', email=request.form['user-email'],
+         download=download)
+   g.c.execute('SELECT email, download FROM users WHERE id = ?', (g.user['uid'],))
+   email, download = g.c.fetchall()[0]
+   if not email:
       email = ''
-   return render_template('user.html', email=email)
+   return render_template('user.html', email=email, download=download)
 
 @app.route('/oversight')
 @login_required
