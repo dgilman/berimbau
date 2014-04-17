@@ -79,9 +79,9 @@ with top_50_lock:
 
 app = Flask(__name__)
 
-#@app.errorhandler(sqlite3.OperationalError)
-#def foo(e):
-#   return Response('you hit a locking error with sqlite3, try again')
+@app.errorhandler(sqlite3.OperationalError)
+def foo(e):
+   return Response('you hit a locking error with sqlite3, try again', 500)
 
 def login_page():
    return Response('Please log in', 401, {'WWW-Authenticate': 'Basic realm="dsfareg"'})
