@@ -98,7 +98,7 @@ def login_required(fn):
       if not rval:
          return login_page()
       uid, password_hash, is_admin, download = rval[0]
-      if bcrypt.hashpw(auth.password, password_hash):
+      if bcrypt.checkpw(auth.password, password_hash):
          g.user = {"uid": uid, "username": auth.username, "is_admin": is_admin}
          if download:
             g.user['download'] = True
