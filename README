@@ -21,3 +21,14 @@ Requirements:
    make it multi-platform, patches welcome.
    fs.py also makes use of the MacFSEvents python module which is mac-only.
 - flask
+
+Installation:
+1. Get a wsgi server working.  I used apache 2.4 and mod_wsgi.
+1a. Test it with a tiny wsgi app just to be sure apache is working with your
+      venv.
+2. Check out the repo, set up a venv, install modules
+3. Patch platform-specific code if necessary
+4. app.wsgi.example is an example WSGI app that sets up the proper virtualenv
+   stuff, you'll want to edit it for your configuration and point your web
+   server at it
+5. config.py.example shows how to set up the configuration file
