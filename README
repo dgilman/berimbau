@@ -17,7 +17,7 @@ Cool features:
 
 Requirements:
 - Python 3.4
-- MacOS X: ifbw uses a BSD syscall.  It's possible to factor this out and
+- MacOS X: ifbw.py uses a BSD syscall.  It's possible to factor this out and
    make it multi-platform, patches welcome.
    fs.py also makes use of the MacFSEvents python module which is mac-only.
 - flask
