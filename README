@@ -1,0 +1,23 @@
+berimbau is a web-based file browser.  The idea is that you've got these files
+and you want to share them with your friends, so you point berimbau at some
+directories and you serve it from there.
+
+Cool features:
+
+- Python3 (3.4 required, it uses the new pathlib module)
+- Queries for current bandwidth usage and displays that on each page.
+   This might seem like a weird feature, but it can give your friends a good
+   idea of how much bandwidth is being used
+- The front page has a 'newest files' which is updated on the fly as they
+   are added/removed from the filesystem
+- Logs accesses/downloads done by each user and has an OK interface for
+   browsing that.  I know it's redundant on most servers, but I wanted it.
+- Used to support xsendfile but I turned it off because it's broken on mac
+
+
+Requirements:
+- Python 3.4
+- MacOS X: ifbw uses a BSD syscall.  It's possible to factor this out and
+   make it multi-platform, patches welcome.
+   fs.py also makes use of the MacFSEvents python module which is mac-only.
+- flask
