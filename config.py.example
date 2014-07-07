@@ -1,3 +1,5 @@
+raise Exception('You need to configure config.py.  Set it up with your paths using the example as a guide.')
+
 class TorrentRoot(object):
    root = '/Volumes/ntfs/Torrents'
    rid = 0
